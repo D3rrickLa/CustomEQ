@@ -58,6 +58,17 @@ public:
     juce::AudioProcessorValueTreeState apvts { *this, nullptr, "Parameters", createParameterLayout()};
 
 private:
+    // so much of the audio is mono, but we are making a stereo VST, this is how we are going to fix that
+    using Filter = juce::dsp::IIR::Filter<float>; 
+
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter, Filter, Filter, Filter, Filter>; // basically how we are doing 12, 24, 36, etc. is we are just chaining the same filter over and over again
+
+    // chain for mono 
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+    // need 2 mono chains for stereo
+    MonoChain leftChain, rightChain;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CustomEQAudioProcessor)
 };
