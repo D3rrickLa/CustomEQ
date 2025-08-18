@@ -166,7 +166,8 @@ bool CustomEQAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* CustomEQAudioProcessor::createEditor()
 {
-    return new CustomEQAudioProcessorEditor (*this);
+    //return new CustomEQAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -177,10 +178,81 @@ void CustomEQAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void CustomEQAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void CustomEQAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout
+    CustomEQAudioProcessor::createParameterLayout() 
+{
+    // 3 EQ bands: Low, High, Peak
+    // Low and High, we controller FQ cutoff and slop
+    // Peak -> center Frequency, Gain, and Quailty (how low/wide the cut)
+
+    // AudioProcessorParameter -> generic audio interface for all audio parameter formats
+    // that different plugin units used (VST, AUv3, RTAS, AAX, etc.)
+    // AUdioParameterFLoat -> Parameters with a ragne of values 
+
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "LowCut Freq", 
+        "LowCut Freq", 
+        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 1.f), 
+        20.f
+    ));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "HighCut Freq",
+        "HighCut Freq",
+        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 1.f),
+        20000.f
+    ));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "HighCut Freq",
+        "HighCut Freq",
+        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 1.f), // range start, range end, interval, skew -> when moving knob how much is knob dedicated to controller low/high
+        750.f // starting value
+    ));
+
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "Peak Gain",
+        "Peak Gain",
+        juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f), // controls in decibel
+        0.0f// no gain
+    ));
+
+    // quality control of how narrow or wide the Q value is for the band
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "Peak Quality ",
+        "Peak Quality",
+        juce::NormalisableRange<float>(-1.f,10.f, 0.05f, 1.f), // controls in decibel, steps -> 0.05, 0.01, etc.
+        1.f// no gain
+    ));
+
+    // low cut and high cut steepness, expressed in dB per octav and are muiltiples of 6 or 12s. because we have a choice, we use the AudioParameterChoice object 
+
+    juce::StringArray stringArray;
+    for (int i = 0; i < 4; i++)
+    {
+        juce::String str; 
+        str << (12 + i * 12);
+        str << " db/Oct";
+        stringArray.add(str);
+    }
+
+    stringArray.add("96 db/Oct");
+
+    // default slop is 12
+    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
+
+
+    return layout;
 }
 
 //==============================================================================
