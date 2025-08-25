@@ -106,6 +106,22 @@ void CustomEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
     leftChain.prepare(spec);
     rightChain.prepare(spec);
+
+    // coefficient 
+    auto chainSettings = getChainSettings(apvts);
+
+    // ref counted wrapper on the heap
+    auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+        sampleRate, 
+        chainSettings.peakFreq, 
+        chainSettings.peakQuality, 
+        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+
+    // setting coefficients 
+    *leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    *rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+
+
 }
 
 void CustomEQAudioProcessor::releaseResources()
@@ -155,7 +171,19 @@ void CustomEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-   
+    // updating parameter BEFORE audio processing
+    auto chainSettings = getChainSettings(apvts);
+
+    // ref counted wrapper on the heap
+    auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+        getSampleRate(),
+        chainSettings.peakFreq,
+        chainSettings.peakQuality,
+        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+
+    // setting coefficients 
+    *leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    *rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
 
     // we a context for the processing block to run the links in the chain
     // we must provide an audio block for the context. we need the channels
@@ -198,6 +226,22 @@ void CustomEQAudioProcessor::setStateInformation(const void* data, int sizeInByt
     // whose contents will have been created by the getStateInformation() call.
 }
 
+// getting params
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
+{
+    ChainSettings settings;
+
+    settings.lowCutFreq = apvts.getRawParameterValue("LowCut Freq")->load(); // units in range we care about, when we get it
+    settings.highCutFreq = apvts.getRawParameterValue("HIghCut Freq")->load(); 
+    settings.peakFreq = apvts.getRawParameterValue("Peak Freq")->load(); 
+    settings.peakGainInDecibels = apvts.getRawParameterValue("Peak Gain")->load(); 
+    settings.peakQuality = apvts.getRawParameterValue("Peak Quality")->load(); 
+    settings.lowCutSlope = apvts.getRawParameterValue("LowCut Slope")->load(); 
+    settings.highCutSlope = apvts.getRawParameterValue("HighCut Slope")->load(); 
+    
+    return settings;
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout
     CustomEQAudioProcessor::createParameterLayout() 
 {
@@ -226,9 +270,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "HighCut Freq",
-        "HighCut Freq",
-        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 1.f), // range start, range end, interval, skew -> when moving knob how much is knob dedicated to controller low/high
+        "Peak Freq",
+        "Peak Freq",
+        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 0.25f), // range start, range end, interval, skew -> when moving knob how much is knob dedicated to controller low/high
         750.f // starting value
     ));
 
