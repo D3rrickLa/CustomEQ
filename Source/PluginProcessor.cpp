@@ -232,7 +232,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     ChainSettings settings;
 
     settings.lowCutFreq = apvts.getRawParameterValue("LowCut Freq")->load(); // units in range we care about, when we get it
-    settings.highCutFreq = apvts.getRawParameterValue("HIghCut Freq")->load(); 
+    settings.highCutFreq = apvts.getRawParameterValue("HighCut Freq")->load(); 
     settings.peakFreq = apvts.getRawParameterValue("Peak Freq")->load(); 
     settings.peakGainInDecibels = apvts.getRawParameterValue("Peak Gain")->load(); 
     settings.peakQuality = apvts.getRawParameterValue("Peak Quality")->load(); 
@@ -286,7 +286,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 
     // quality control of how narrow or wide the Q value is for the band
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "Peak Quality ",
+        "Peak Quality",
         "Peak Quality",
         juce::NormalisableRange<float>(-1.f,10.f, 0.05f, 1.f), // controls in decibel, steps -> 0.05, 0.01, etc.
         1.f// no gain
