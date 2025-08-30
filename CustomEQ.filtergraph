@@ -61,28 +61,11 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="7" x="0.29" y="0.3447580645161291" useARA="0" uiLastX_Normal="144"
-          uiLastY_Normal="6" uiopen_Normal="1">
-    <PLUGIN name="TestAudioPlayer" format="VST3" category="Fx" manufacturer="yourcompany"
-            version="1.0.0" file="C:\Users\Gen3r\Documents\Projects\TestAudioPlugin\TestAudioPlayer\Builds\VisualStudio2022\x64\Debug\VST3\TestAudioPlayer.vst3\Contents\x86_64-win\TestAudioPlayer.vst3"
-            uniqueId="696a924" isInstrument="0" fileTime="198bff5fec7" infoUpdateTime="198bff83515"
-            numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
-            uid="e95c6506"/>
-    <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
-    <LAYOUT>
-      <INPUTS>
-        <BUS index="0" layout="L R"/>
-      </INPUTS>
-      <OUTPUTS>
-        <BUS index="0" layout="L R"/>
-      </OUTPUTS>
-    </LAYOUT>
-  </FILTER>
-  <FILTER uid="9" x="0.43375" y="0.5887096774193549" useARA="0" uiLastX_Normal="712"
-          uiLastY_Normal="117" uiopen_Normal="1">
+  <FILTER uid="5" x="0.625" y="0.5262096774193549" useARA="0" uiLastX_Normal="544"
+          uiLastY_Normal="384" uiopen_Normal="0">
     <PLUGIN name="CustomEQ" format="VST3" category="Fx" manufacturer="yourcompany"
             version="1.0.0" file="C:\Users\Gen3r\Documents\Projects\CustomEQ\Builds\VisualStudio2022\x64\Debug\VST3\CustomEQ.vst3\Contents\x86_64-win\CustomEQ.vst3"
-            uniqueId="2a0e017" isInstrument="0" fileTime="198bf6c1c41" infoUpdateTime="198bff83516"
+            uniqueId="2a0e017" isInstrument="0" fileTime="198e29a71e4" infoUpdateTime="198e29be8c3"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e95abfb0"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
@@ -95,8 +78,25 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <CONNECTION srcFilter="7" srcChannel="0" dstFilter="9" dstChannel="0"/>
-  <CONNECTION srcFilter="7" srcChannel="1" dstFilter="9" dstChannel="1"/>
-  <CONNECTION srcFilter="9" srcChannel="0" dstFilter="3" dstChannel="0"/>
-  <CONNECTION srcFilter="9" srcChannel="1" dstFilter="3" dstChannel="1"/>
+  <FILTER uid="6" x="0.36375" y="0.3125" useARA="0" uiLastX_Normal="61"
+          uiLastY_Normal="428" uiopen_Normal="0">
+    <PLUGIN name="TestAudioPlayer" format="VST3" category="Fx" manufacturer="yourcompany"
+            version="1.0.0" file="C:\Users\Gen3r\Documents\Projects\TestAudioPlugin\TestAudioPlayer\Builds\VisualStudio2022\x64\Debug\VST3\TestAudioPlayer.vst3\Contents\x86_64-win\TestAudioPlayer.vst3"
+            uniqueId="696a924" isInstrument="0" fileTime="198bff5fec7" infoUpdateTime="198e29be8c3"
+            numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
+            uid="e95c6506"/>
+    <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
+    <LAYOUT>
+      <INPUTS>
+        <BUS index="0" layout="L R"/>
+      </INPUTS>
+      <OUTPUTS>
+        <BUS index="0" layout="L R"/>
+      </OUTPUTS>
+    </LAYOUT>
+  </FILTER>
+  <CONNECTION srcFilter="5" srcChannel="0" dstFilter="3" dstChannel="0"/>
+  <CONNECTION srcFilter="5" srcChannel="1" dstFilter="3" dstChannel="1"/>
+  <CONNECTION srcFilter="6" srcChannel="0" dstFilter="5" dstChannel="0"/>
+  <CONNECTION srcFilter="6" srcChannel="1" dstFilter="5" dstChannel="1"/>
 </FILTERGRAPH>
