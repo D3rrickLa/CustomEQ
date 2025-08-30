@@ -375,7 +375,7 @@ void CustomEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     auto cutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
         chainSettings.lowCutFreq,
         getSampleRate(),
-        2 * (chainSettings.lowCutSlope + 1)); // 0, 1, 2 ,3, 4? and double it to get us 2 4 6 8, and 10? should be 16
+        order); // 0, 1, 2 ,3, 4? and double it to get us 2 4 6 8, and 10? should be 16
 
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
 
