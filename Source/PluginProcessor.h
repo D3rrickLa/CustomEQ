@@ -101,6 +101,12 @@ private:
     using Coefficients = Filter::CoefficientsPtr;
     static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
 
+    template<int Index, typename ChainType, typename CoefficientType>
+    void update(ChainType& chain, const CoefficientType& coefficients) {
+        updateCoefficients(chain.template get<Index>().coefficients, coefficients[Index]);
+        chain.template setBypassed<Index>(false);
+    }
+
     template<typename ChainType, typename CoefficientType>
     void updateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficients, const Slope& lowCutSlope)
     {
@@ -115,71 +121,26 @@ private:
         leftLowCut.template setBypassed<7>(true);
                             
         // order is 2* ish, helper will return 1 coefficient only
+        // using case slope reversing so no more breaking
         switch (lowCutSlope)
         {
-            case Slope_12:
-            {
-                *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.template setBypassed<0>(false);
-                break;
+            case Slope_96: {
+                update<7>(leftLowCut, cutCoefficients);
+                update<6>(leftLowCut, cutCoefficients);
+                update<5>(leftLowCut, cutCoefficients);
+                update<4>(leftLowCut, cutCoefficients);
             }
-
-            case Slope_24:
-            {
-                *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.template setBypassed<0>(false);
-                *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
-                leftLowCut.template setBypassed<1>(false);
-                break;
+            case Slope_48: {
+                update<3>(leftLowCut, cutCoefficients);
             }
-            case Slope_36:
-            {
-                *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.template setBypassed<0>(false);
-                *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
-                leftLowCut.template setBypassed<1>(false);
-                *leftLowCut.template get<2>().coefficients = *cutCoefficients[2];
-                leftLowCut.template setBypassed<2>(false);
-                break;
+            case Slope_36: {
+                update<2>(leftLowCut, cutCoefficients);
             }
-            case Slope_48:
-            {
-                *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.template setBypassed<0>(false);
-                *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
-                leftLowCut.template setBypassed<1>(false);
-                *leftLowCut.template get<2>().coefficients = *cutCoefficients[2];
-                leftLowCut.template setBypassed<2>(false);
-                *leftLowCut.template get<3>().coefficients = *cutCoefficients[3];
-                leftLowCut.template setBypassed<3>(false);
-                break;
+            case Slope_24: {
+                update<1>(leftLowCut, cutCoefficients);
             }
-            case Slope_96:
-            {
-                *leftLowCut.template get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.template setBypassed<0>(false);
-
-                *leftLowCut.template get<1>().coefficients = *cutCoefficients[1];
-                leftLowCut.template setBypassed<1>(false);
-
-                *leftLowCut.template get<2>().coefficients = *cutCoefficients[2];
-                leftLowCut.template setBypassed<2>(false);
-
-                *leftLowCut.template get<3>().coefficients = *cutCoefficients[3];
-                leftLowCut.template setBypassed<3>(false);
-
-                *leftLowCut.template get<4>().coefficients = *cutCoefficients[4];
-                leftLowCut.template setBypassed<4>(false);
-
-                *leftLowCut.template get<5>().coefficients = *cutCoefficients[5];
-                leftLowCut.template setBypassed<5>(false);
-
-                *leftLowCut.template get<6>().coefficients = *cutCoefficients[6];
-                leftLowCut.template setBypassed<6>(false);
-
-                *leftLowCut.template get<7>().coefficients = *cutCoefficients[7];
-                leftLowCut.template setBypassed<7>(false);
-                break;
+            case Slope_12: {
+                update<0>(leftLowCut, cutCoefficients);
             }
         }
     }
