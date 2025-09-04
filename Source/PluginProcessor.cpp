@@ -110,16 +110,18 @@ void CustomEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     // coefficient 
     auto chainSettings = getChainSettings(apvts);
 
-    // ref counted wrapper on the heap
-    auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-        sampleRate, 
-        chainSettings.peakFreq, 
-        chainSettings.peakQuality, 
-        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+    updatePeakFilter(chainSettings);
 
-    // setting coefficients 
-    *leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
-    *rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    //// ref counted wrapper on the heap
+    //auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+    //    sampleRate, 
+    //    chainSettings.peakFreq, 
+    //    chainSettings.peakQuality, 
+    //    juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+
+    //// setting coefficients 
+    //*leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    //*rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
 
     // helper functions for IIR
     // inside the implementation
@@ -359,17 +361,19 @@ void CustomEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     // updating parameter BEFORE audio processing
     auto chainSettings = getChainSettings(apvts);
+    
+    updatePeakFilter(chainSettings);
 
     // ref counted wrapper on the heap
-    auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-        getSampleRate(),
-        chainSettings.peakFreq,
-        chainSettings.peakQuality,
-        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+    //auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+    //    getSampleRate(),
+    //    chainSettings.peakFreq,
+    //    chainSettings.peakQuality,
+    //    juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 
-    // setting coefficients 
-    *leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
-    *rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    //// setting coefficients 
+    //*leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    //*rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
 
     // we a context for the processing block to run the links in the chain
     // we must provide an audio block for the context. we need the channels
@@ -604,6 +608,19 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.highCutSlope = static_cast<Slope>(apvts.getRawParameterValue("HighCut Slope")->load());
     
     return settings;
+}
+
+void CustomEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings) 
+{
+    auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+        getSampleRate(),
+        chainSettings.peakFreq,
+        chainSettings.peakQuality,
+        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+
+    // setting coefficients 
+    *leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    *rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
