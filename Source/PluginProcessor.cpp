@@ -123,20 +123,12 @@ void CustomEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
         but we also have 96 db/oct, with that logic, the orders will have to be 2, 4, 6, and 16 for 5 choices
     */
-    int order = 0;
-    switch (chainSettings.lowCutSlope)
-    {
-        case Slope_12: order = 2;  break;
-        case Slope_24: order = 4;  break;
-        case Slope_36: order = 6;  break;
-        case Slope_48: order = 8;  break;
-        case Slope_96: order = 16; break;
-    }
+    int lowOrder = getOrderForSlope(chainSettings.lowCutSlope);
 
     auto lowCutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
         chainSettings.lowCutFreq,
         getSampleRate(),
-        order); // 0, 1, 2 ,3, 4? and double it to get us 2 4 6 8, and 10? should be 16
+        lowOrder); // 0, 1, 2 ,3, 4? and double it to get us 2 4 6 8, and 10? should be 16
 
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
     updateCutFilter(leftLowCut, lowCutCoefficients, chainSettings.lowCutSlope);
@@ -146,10 +138,12 @@ void CustomEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
 
     // high cut, same thing
+    int highOrder = getOrderForSlope(chainSettings.highCutSlope);
+
     auto highCutCoefficients = juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(
         chainSettings.highCutFreq,
         getSampleRate(),
-        order
+        highOrder
     );
 
     auto& leftHighCut = leftChain.get<ChainPositions::HighCut>();
@@ -218,20 +212,12 @@ void CustomEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     juce::dsp::AudioBlock<float> block(buffer);
 
 
-    int order = 0;
-    switch (chainSettings.lowCutSlope)
-    {
-    case Slope_12: order = 2;  break;
-    case Slope_24: order = 4;  break;
-    case Slope_36: order = 6;  break;
-    case Slope_48: order = 8;  break;
-    case Slope_96: order = 16; break;
-    }
+    int lowOrder = getOrderForSlope(chainSettings.lowCutSlope);
 
     auto cutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
         chainSettings.lowCutFreq,
         getSampleRate(),
-        order); // 0, 1, 2 ,3, 4? and double it to get us 2 4 6 8, and 10? should be 16
+        lowOrder); // 0, 1, 2 ,3, 4? and double it to get us 2 4 6 8, and 10? should be 16
 
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
     updateCutFilter(leftLowCut, cutCoefficients, chainSettings.lowCutSlope);
@@ -240,10 +226,12 @@ void CustomEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     updateCutFilter(rightLowCut, cutCoefficients, chainSettings.lowCutSlope);
 
     // high cut, same thing
+    int highOrder = getOrderForSlope(chainSettings.highCutSlope);
+
     auto highCutCoefficients = juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(
         chainSettings.highCutFreq,
         getSampleRate(),
-        order
+        highOrder
     );
 
     auto& leftHighCut = leftChain.get<ChainPositions::HighCut>();
@@ -307,6 +295,20 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
 
 void CustomEQAudioProcessor::updateCoefficients(Coefficients& old, const Coefficients& replacements) {
     *old = *replacements;
+}
+
+int CustomEQAudioProcessor::getOrderForSlope(Slope slope) const
+{
+    switch (slope)
+    {
+    case Slope_12: return 2;
+    case Slope_24: return 4;
+    case Slope_36: return 6;
+    case Slope_48: return 8;
+    case Slope_96: return 16;
+    }
+    jassertfalse; // unexpected slope
+    return 2;
 }
 
 void CustomEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings) 

@@ -102,7 +102,8 @@ private:
     static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
 
     template<int Index, typename ChainType, typename CoefficientType>
-    void update(ChainType& chain, const CoefficientType& coefficients) {
+    void update(ChainType& chain, const CoefficientType& coefficients)
+    {
         updateCoefficients(chain.template get<Index>().coefficients, coefficients[Index]);
         chain.template setBypassed<Index>(false);
     }
@@ -141,9 +142,13 @@ private:
             }
             case Slope_12: {
                 update<0>(leftLowCut, cutCoefficients);
+                break;
             }
         }
     }
+
+    // custom helper for the swtich statement in the cpp
+    int getOrderForSlope(Slope slope) const;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CustomEQAudioProcessor)
