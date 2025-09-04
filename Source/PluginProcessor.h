@@ -150,6 +150,14 @@ private:
     // custom helper for the swtich statement in the cpp
     int getOrderForSlope(Slope slope) const;
 
+
+    // updating the low and high cuts
+    void updateLowCutFilters(const ChainSettings& chainSettings);
+    void updateHighCutFilters(const ChainSettings& chainSettings);
+
+    // updating all filter
+    void updateFilter();
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CustomEQAudioProcessor)
 };
