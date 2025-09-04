@@ -133,16 +133,30 @@ void CustomEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
         case Slope_96: order = 16; break;
     }
 
-    auto cutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
+    auto lowCutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
         chainSettings.lowCutFreq,
         getSampleRate(),
         order); // 0, 1, 2 ,3, 4? and double it to get us 2 4 6 8, and 10? should be 16
 
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
-    updateCutFilter(leftLowCut, cutCoefficients, chainSettings.lowCutSlope);
+    updateCutFilter(leftLowCut, lowCutCoefficients, chainSettings.lowCutSlope);
 
     auto& rightLowCut = rightChain.get<ChainPositions::LowCut>();
-    updateCutFilter(rightLowCut, cutCoefficients, chainSettings.lowCutSlope);   
+    updateCutFilter(rightLowCut, lowCutCoefficients, chainSettings.lowCutSlope);
+
+
+    // high cut, same thing
+    auto highCutCoefficients = juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(
+        chainSettings.highCutFreq,
+        getSampleRate(),
+        order
+    );
+
+    auto& leftHighCut = leftChain.get<ChainPositions::HighCut>();
+    updateCutFilter(leftHighCut, highCutCoefficients, chainSettings.highCutSlope);
+
+    auto& rightHighCut = rightChain.get<ChainPositions::HighCut>();
+    updateCutFilter(rightHighCut, highCutCoefficients, chainSettings.highCutSlope);
 }
 
 void CustomEQAudioProcessor::releaseResources()
@@ -224,6 +238,19 @@ void CustomEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     auto& rightLowCut = rightChain.get<ChainPositions::LowCut>();
     updateCutFilter(rightLowCut, cutCoefficients, chainSettings.lowCutSlope);
+
+    // high cut, same thing
+    auto highCutCoefficients = juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(
+        chainSettings.highCutFreq,
+        getSampleRate(),
+        order
+    );
+
+    auto& leftHighCut = leftChain.get<ChainPositions::HighCut>();
+    updateCutFilter(leftHighCut, highCutCoefficients, chainSettings.highCutSlope);
+
+    auto& rightHighCut = rightChain.get<ChainPositions::HighCut>();
+    updateCutFilter(rightHighCut, highCutCoefficients, chainSettings.highCutSlope);
 
 
     auto leftBlock = block.getSingleChannelBlock(0);
