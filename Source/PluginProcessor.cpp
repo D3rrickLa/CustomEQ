@@ -112,16 +112,6 @@ void CustomEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
     updatePeakFilter(chainSettings);
 
-    //// ref counted wrapper on the heap
-    //auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-    //    sampleRate, 
-    //    chainSettings.peakFreq, 
-    //    chainSettings.peakQuality, 
-    //    juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
-
-    //// setting coefficients 
-    //*leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
-    //*rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
 
     // helper functions for IIR
     // inside the implementation
@@ -364,16 +354,6 @@ void CustomEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     
     updatePeakFilter(chainSettings);
 
-    // ref counted wrapper on the heap
-    //auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-    //    getSampleRate(),
-    //    chainSettings.peakFreq,
-    //    chainSettings.peakQuality,
-    //    juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
-
-    //// setting coefficients 
-    //*leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
-    //*rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
 
     // we a context for the processing block to run the links in the chain
     // we must provide an audio block for the context. we need the channels
@@ -610,17 +590,21 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     return settings;
 }
 
+void CustomEQAudioProcessor::updateCoefficients(Coefficients& old, const Coefficients& replacements) {
+    *old = *replacements;
+}
+
 void CustomEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings) 
 {
-    auto preakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
         getSampleRate(),
         chainSettings.peakFreq,
         chainSettings.peakQuality,
         juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 
     // setting coefficients 
-    *leftChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
-    *rightChain.get<ChainPositions::Peak>().coefficients = *preakCoefficients;
+    updateCoefficients(leftChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
+    updateCoefficients(rightChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
@@ -639,21 +623,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "LowCut Freq", 
         "LowCut Freq", 
-        juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f), 
+        juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 1.f), 
         20.f
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "HighCut Freq",
         "HighCut Freq",
-        juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),
+        juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 1.f),
         20000.f
     ));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "Peak Freq",
         "Peak Freq",
-        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 0.25f), // range start, range end, interval, skew -> when moving knob how much is knob dedicated to controller low/high
+        juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 0.25f), // range start, range end, interval, skew -> when moving knob how much is knob dedicated to controller low/high
         750.f // starting value
     ));
 
@@ -669,7 +653,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "Peak Quality",
         "Peak Quality",
-        juce::NormalisableRange<float>(-1.f,10.f, 0.05f, 1.f), // controls in decibel, steps -> 0.05, 0.01, etc.
+        juce::NormalisableRange<float>(0.1f,10.f, 0.05f, 1.f), // controls in decibel, steps -> 0.05, 0.01, etc.
         1.f// no gain
     ));
 
