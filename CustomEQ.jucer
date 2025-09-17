@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="uLnBad" name="CustomEQ" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginVST3Category="EQ"
+              pluginAAXCategory="1">
   <MAINGROUP id="D1Bx6v" name="CustomEQ">
     <GROUP id="{3ABB128E-7C2C-7F48-41A0-FA517377EB92}" name="Source">
       <FILE id="TFvFIC" name="PluginProcessor.cpp" compile="1" resource="0"

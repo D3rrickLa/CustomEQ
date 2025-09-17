@@ -11,4 +11,5 @@ So to keep a long story short. this VST will have the option for the user to hav
 ## Initial Features
 - 3 band EQ with resonance
 - waveform of incoming sound and overlay of what each of the band is doing to the sound
-- different levels of X cut for low and high end. 12x, 24x, 48x, 96x, straight line
+- different levels of X cut for low and high end. 12x, 24x, 48x, 96x.
+- - logic to cancel out phase issue at higher db/oct settings
